@@ -1,0 +1,153 @@
+def exploitOnly():
+    import random
+
+    # first three days visit one caf a day, calculate happiness for each
+    c1happiness = random.normalvariate(10, 8)
+    c2happiness = random.normalvariate(15, 6)
+    c3happiness = random.normalvariate(12, 5)
+
+    # give sum of all happiness values an initial value by adding happiness for first 3 days
+    hsum = c1happiness + c2happiness + c3happiness
+
+    # figure out which cafeteria was best based on happiness
+    if (c1happiness > c2happiness) & (c1happiness > c3happiness):
+        bestmean = 10
+        bestdev = 8
+    elif (c2happiness > c1happiness) & (c2happiness > c3happiness):
+        bestmean = 15
+        bestdev = 6
+    else:
+        bestmean = 12
+        bestdev = 5
+
+    # set day for while loop to initial value 1
+    day = 1
+
+    # Each day finds happiness at the best cafeteria and add that to happiness sum,
+    # then increments day so goes to next day
+    # Goes through while loop 297 times
+    while day < 298:
+        dayhappiness = random.normalvariate(bestmean, bestdev)
+        hsum += dayhappiness
+        day += 1
+
+    # returns sum of all 300 days
+    return hsum
+
+
+def exploreOnly():
+    import random
+
+    # set day for while loop to initial value 1, and sum of happiness to 0
+    day = 1
+    hsum = 0
+
+    # Each day finds happiness at the corresponding cafeteria(first 100 days c1, next c2, etc.)
+    # and adds that to happiness sum,
+    # then increments day so goes to next day
+    # Goes through while loop 300 times
+    while day < 301:
+        if day < 101:
+            dayhappiness = random.normalvariate(10, 8)
+        elif day < 201:
+            dayhappiness = random.normalvariate(15, 6)
+        else:
+            dayhappiness = random.normalvariate(12, 5)
+        hsum += dayhappiness
+        day += 1
+
+    # returns sum of all 300 days
+    return hsum
+
+
+def eGreedy(e=10):
+    import random
+
+    # first three days visit one caf a day, calculate happiness for each
+    c1happiness = random.normalvariate(10, 8)
+    c2happiness = random.normalvariate(15, 6)
+    c3happiness = random.normalvariate(12, 5)
+
+    # give sum of all happiness values an initial value by adding happiness for first 3 days
+    hsum = c1happiness + c2happiness + c3happiness
+
+    # figure out which cafeteria was best based on happiness
+    if (c1happiness > c2happiness) & (c1happiness > c3happiness):
+        bestmean = 10
+        bestdev = 8
+    elif (c2happiness > c1happiness) & (c2happiness > c3happiness):
+        bestmean = 15
+        bestdev = 6
+    else:
+        bestmean = 12
+        bestdev = 5
+
+    day = 1
+
+    while day < 298:
+        # Generate a random float 0 < r < 1
+        r = random.random()
+        # Goes to a random cafeteria if satisfies condition
+        if r < (e / 100):
+            # Generate a random integer of 1, 2, or 3
+            i = random.randint(1, 3)
+            if i == 1:
+                dayhappiness = random.normalvariate(10, 8)
+            elif i == 2:
+                dayhappiness = random.normalvariate(15, 6)
+            else:
+                dayhappiness = random.normalvariate(12, 5)
+        # Goes to best cafeteria
+        else:
+            dayhappiness = random.normalvariate(bestmean, bestdev)
+
+        # adds dayhappiness determined above to happiness sum
+        hsum += dayhappiness
+        # increments day
+        day += 1
+
+    return hsum
+
+
+def Simulation(t, e):
+    num = 0
+
+    exploit = 0
+    explore = 0
+    greedy = 0
+
+    while num < t:
+        exploit += exploitOnly()
+        explore += exploreOnly()
+        greedy += eGreedy(e)
+
+    optHappiness = 300*10
+
+    exploit_totHap = 10 + 8 + 5 + 297*10
+    exploit_totReg = optHappiness - exploit_totHap
+
+    explore_totHap = 10*100 + 8*100 + 5*100
+    explore_totReg = optHappiness - explore_totHap
+
+    num = 100-e
+    num2 = num/100
+    num3 = num2*300
+
+    num4 = e/3
+    num5 = num4/100
+    num6 = num5*300
+
+    greedy_totHap = (10 * num3) + (10*num6) + (8*num6)+(5*num6)
+    greedy_totReg = optHappiness - greedy_totHap
+
+    explore_avHap = explore/t
+    exploit_avHap = exploit/t
+    greedy_avHap = greedy/t
+    explore_avReg = optHappiness - explore_avHap
+    exploit_avReg = optHappiness - exploit_avHap
+    greedy_avReg = optHappiness - greedy_avHap
+
+    print("Function  Optimum Happiness  Expected Total Happiness  Expected Total Regret  Average Total Happiness  Average Total Regret")
+    print("Explore  "+optHappiness + "  "+explore_totHap + "  " + explore_totReg + "  " + explore_avHap + "  " + explore_avReg)
+    print("Exploit  "+optHappiness + "  "+exploit_totHap + "  " + exploit_totReg + "  " + exploit_avHap + "  " + exploit_avReg)
+    print("Explore  "+optHappiness + "  "+greedy_totHap + "  " + greedy_totReg + "  " + greedy_avHap + "  " + greedy_avReg)
