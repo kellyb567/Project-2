@@ -83,6 +83,9 @@ def eGreedy(e=10):
         bestdev = 5
 
     day = 1
+    count1 = 1
+    count2 = 1
+    count3 = 1
 
     while day < 298:
         # Generate a random float 0 < r < 1
@@ -93,13 +96,34 @@ def eGreedy(e=10):
             i = random.randint(1, 3)
             if i == 1:
                 dayhappiness = random.normalvariate(10, 8)
+                c1happiness += dayhappiness
+                count1 += 1
             elif i == 2:
                 dayhappiness = random.normalvariate(15, 6)
+                c2happiness += dayhappiness
+                count2 += 1
             else:
                 dayhappiness = random.normalvariate(12, 5)
+                c3happiness += dayhappiness
+                count3 += 1
         # Goes to best cafeteria
         else:
             dayhappiness = random.normalvariate(bestmean, bestdev)
+
+
+
+        currentAvHap1= c1happiness/count1
+        currentAvHap2 = c2happiness / count2
+        currentAvHap3 = c3happiness / count3
+        if (currentAvHap1 > currentAvHap2) & (currentAvHap1 > currentAvHap3):
+            bestmean = 10
+            bestdev = 8
+        elif (currentAvHap2 > currentAvHap1) & (currentAvHap2 > currentAvHap3):
+            bestmean = 15
+            bestdev = 6
+        else:
+            bestmean = 12
+            bestdev = 5
 
         # adds dayhappiness determined above to happiness sum
         hsum += dayhappiness
@@ -110,44 +134,56 @@ def eGreedy(e=10):
 
 
 def Simulation(t, e):
-    num = 0
 
+    # initial values for num and exploit(variables used in while loop)
+    num = 0
     exploit = 0
     explore = 0
     greedy = 0
 
+    # runs each function through the number of trials
     while num < t:
         exploit += exploitOnly()
         explore += exploreOnly()
         greedy += eGreedy(e)
+        num += 1
 
-    optHappiness = 300*10
+    # finds average happiness by taking variable which
+    # is sum of all trials of each function and dividing by amount of trials
+    explore_avHap = explore / t
+    exploit_avHap = exploit / t
+    greedy_avHap = greedy / t
 
-    exploit_totHap = 10 + 8 + 5 + 297*10
+    # finds optimum happiness
+    optHappiness = 300*15
+
+    # finds total happiness for exploit
+    exploit_totHap = 10 + 12 + 15 + 297*15
     exploit_totReg = optHappiness - exploit_totHap
 
-    explore_totHap = 10*100 + 8*100 + 5*100
+    # finds total happiness for explore
+    explore_totHap = (10*100) + (12*100) + (15*100)
     explore_totReg = optHappiness - explore_totHap
 
-    num = 100-e
-    num2 = num/100
-    num3 = num2*300
-
-    num4 = e/3
-    num5 = num4/100
-    num6 = num5*300
-
-    greedy_totHap = (10 * num3) + (10*num6) + (8*num6)+(5*num6)
+    # find total happiness for eGreedy
+    num1 = ((100-e)/100)*300
+    num2 = ((e/3)/100)*300
+    greedy_totHap = (15* num1) + (15*num2) + (12*num2)+(10*num2)
     greedy_totReg = optHappiness - greedy_totHap
 
-    explore_avHap = explore/t
-    exploit_avHap = exploit/t
-    greedy_avHap = greedy/t
+    # finds average regret for all three functions
+    # by taking optimum happiness and subtracting each function's average happiness
     explore_avReg = optHappiness - explore_avHap
     exploit_avReg = optHappiness - exploit_avHap
     greedy_avReg = optHappiness - greedy_avHap
 
+    # prints all results in table form
     print("Function  Optimum Happiness  Expected Total Happiness  Expected Total Regret  Average Total Happiness  Average Total Regret")
-    print("Explore  "+optHappiness + "  "+explore_totHap + "  " + explore_totReg + "  " + explore_avHap + "  " + explore_avReg)
-    print("Exploit  "+optHappiness + "  "+exploit_totHap + "  " + exploit_totReg + "  " + exploit_avHap + "  " + exploit_avReg)
-    print("Explore  "+optHappiness + "  "+greedy_totHap + "  " + greedy_totReg + "  " + greedy_avHap + "  " + greedy_avReg)
+    print("Explore  ", optHappiness, "             ", explore_totHap, "                    ", explore_totReg, "                  ", explore_avHap, "     ", explore_avReg)
+    print("Exploit  ", optHappiness, "             ", exploit_totHap, "                    ", exploit_totReg, "                    ", exploit_avHap, "     ", exploit_avReg)
+    print("EGreedy  ", optHappiness, "             ", int(greedy_totHap), "                    ", int(greedy_totReg), "                   ", greedy_avHap, "     ", greedy_avReg)
+
+
+
+
+
